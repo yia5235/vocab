@@ -6,6 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#2E7D6E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="어휘카드">
+<link rel="apple-touch-icon" href="../shared/img/student-apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../shared/img/student-192.png">
 <title>청자골 아학-교과서 어휘력 카드</title>
 <style>
 @font-face{font-family:"AhakSans";src:url(../shared/fonts/NotoSansKR-regular.woff) format("woff");font-weight:400 600;font-display:swap}
@@ -264,14 +269,17 @@ const ALL=[{"g":3,"s":1,"sub":"국어","p":"국정","unit":"독서 단원","n":1
 function pubsOf(g,s,sub){ const o=[]; ALL.forEach(x=>{ if(x.g===g&&x.s===s&&x.sub===sub&&!o.includes(x.p)) o.push(x.p); }); return o; }
 function cfgFromHash(){
   try{
-    const m=location.hash.match(/[#&]c=([A-Za-z0-9_-]+)/); if(!m) return null;
+    let H=location.hash;
+    if(!/[#&]c=/.test(H)){ try{ const st=localStorage.getItem('vocab:lastHash'); if(st&&/[#&]c=/.test(st)){ H=st; if(/^https?:/.test(location.protocol)) history.replaceState(null,'',location.pathname+location.search+st); } }catch(e){} }
+    const m=H.match(/[#&]c=([A-Za-z0-9_-]+)/); if(!m) return null;
     let b=m[1].replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='=';
     const bin=atob(b), u8=Uint8Array.from(bin,ch=>ch.charCodeAt(0));
     const a=JSON.parse(new TextDecoder().decode(u8)); // [v,school,cls,g,s,[idx...]]
     const g=+a[3], t=+a[4], subjects=[], publishers={};
     SUBJ_ALL.forEach((sub,k)=>{ const ix=a[5][k]; if(ix>=0){ const p=pubsOf(g,t,sub)[ix]; if(p){ subjects.push(sub); publishers[sub]=p; } } });
     if(!subjects.length||!(g>=3&&g<=6)||!(t===1||t===2)) return null;
-    const school=String(a[1]||''), cls=String(a[2]||''); const nm=location.hash.match(/[#&]n=([A-Za-z0-9_-]+)/); const serial=nm?nm[1]:'';
+    try{ localStorage.setItem('vocab:lastHash',H); }catch(e){}
+    const school=String(a[1]||''), cls=String(a[2]||''); const nm=H.match(/[#&]n=([A-Za-z0-9_-]+)/); const serial=nm?nm[1]:'';
     return {school,className:cls,serial,grade:g,semester:t,subjects,publishers,classId:[school,g,cls,t,subjects.map(x=>x+publishers[x]).join(',')].join('_')};
   }catch(e){ return null; }
 }
@@ -607,6 +615,15 @@ stage.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; ty=e.touches[0
 stage.addEventListener('touchend',e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty; tx=null; if(Math.abs(dx)>60&&Math.abs(dy)<80){ go(dx<0?1:-1); } },{passive:true});
 refresh();
 
+</script>
+<script>
+if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+  window.addEventListener('load',()=>{
+    let had=!!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(had) location.reload(); had=true; });
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
