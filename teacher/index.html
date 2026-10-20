@@ -124,7 +124,7 @@ body{font-family:"AhakSans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Ne
     <h2><em>③</em>배포</h2>
     <div class="sum" id="sum"></div>
     <label class="fl">학생용 화면 주소 <small>(학생용 화면 주소 · 보통 그대로 두면 돼요)</small>
-      <input id="base" inputmode="url" placeholder="예: https://gj-vocab.pages.dev/student/" autocomplete="off" spellcheck="false"></label>
+      <input id="base" inputmode="url" placeholder="예: https://○○.github.io/vocab/student/" autocomplete="off" spellcheck="false"></label>
     <div class="warn" id="warn" role="alert"></div>
     <div class="acts"><button class="pri" id="deploy">배포 (학급 링크 만들기)</button><button id="preview">미리보기</button><button id="dlFile">파일로 받기 (오프라인용)</button></div>
     <div id="res" class="res" hidden>
@@ -959,7 +959,7 @@ $('#dlFile').onclick=()=>{ const r=build(); if(!r) return; dl(fname(r.cfg),r.htm
 $('#deploy').onclick=()=>{
   if(!ST.school.trim()){ $('#warn').textContent='학교 이름을 입력해 주세요.'; $('#school').focus(); return; }
   if(!chosen().length){ $('#warn').textContent='과목을 하나 이상 선택해 주세요.'; return; }
-  if(!/^(https?|file):\/\/\S+/.test((ST.base||'').trim())){ $('#warn').textContent='학생용 화면 주소를 먼저 입력해 주세요. (예: https://gj-vocab.pages.dev/student/)'; $('#base').focus(); return; }
+  if(!/^(https?|file):\/\/\S+/.test((ST.base||'').trim())){ $('#warn').textContent='학생용 화면 주소를 먼저 입력해 주세요. (예: https://○○.github.io/vocab/student/)'; $('#base').focus(); return; }
   $('#warn').textContent='';
   const serial=serialNew(); window.__serial=serial; const u=linkOf(serial), svg=QR.svg(u,240);
   $('#url').value=u; $('#qr').innerHTML=svg||'<p class="note sm">링크가 길어 QR을 만들 수 없어요. 링크만 사용해 주세요.</p>';
