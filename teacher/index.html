@@ -124,7 +124,7 @@ body{font-family:"AhakSans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Ne
     <h2><em>③</em>배포</h2>
     <div class="sum" id="sum"></div>
     <label class="fl">학생용 화면 주소 <small>(학생용 화면 주소 · 보통 그대로 두면 돼요)</small>
-      <input id="base" inputmode="url" placeholder="예: https://○○.github.io/vocab/student/" autocomplete="off" spellcheck="false"></label>
+      <input id="base" inputmode="url" placeholder="예: https://교과서어휘력앱.kr/student/" autocomplete="off" spellcheck="false"></label>
     <div class="warn" id="warn" role="alert"></div>
     <div class="acts"><button class="pri" id="deploy">배포 (학급 링크 만들기)</button><button id="preview">미리보기</button><button id="dlFile">파일로 받기 (오프라인용)</button></div>
     <div id="res" class="res" hidden>
@@ -953,13 +953,13 @@ function linkOf(serial){
   let base=(ST.base||'').trim().split('#')[0];
   return base+'#c='+code+'&n='+serial;
 }
-function defBase(){ try{ if(/^https?:/.test(location.protocol)) return new URL('../student/',location.href).href; }catch(e){} return ''; }
+function defBase(){ return 'https://xn--vb0b6f512aj4iqnfplay25h.kr/student/'; }
 function dl(name,html){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); }
 $('#dlFile').onclick=()=>{ const r=build(); if(!r) return; dl(fname(r.cfg),r.html); toast('학생용 파일을 만들었어요 · 어휘 '+r.n+'개'); };
 $('#deploy').onclick=()=>{
   if(!ST.school.trim()){ $('#warn').textContent='학교 이름을 입력해 주세요.'; $('#school').focus(); return; }
   if(!chosen().length){ $('#warn').textContent='과목을 하나 이상 선택해 주세요.'; return; }
-  if(!/^(https?|file):\/\/\S+/.test((ST.base||'').trim())){ $('#warn').textContent='학생용 화면 주소를 먼저 입력해 주세요. (예: https://○○.github.io/vocab/student/)'; $('#base').focus(); return; }
+  if(!/^(https?|file):\/\/\S+/.test((ST.base||'').trim())){ $('#warn').textContent='학생용 화면 주소를 먼저 입력해 주세요. (예: https://교과서어휘력앱.kr/student/)'; $('#base').focus(); return; }
   $('#warn').textContent='';
   const serial=serialNew(); window.__serial=serial; const u=linkOf(serial), svg=QR.svg(u,240);
   $('#url').value=u; $('#qr').innerHTML=svg||'<p class="note sm">링크가 길어 QR을 만들 수 없어요. 링크만 사용해 주세요.</p>';
@@ -970,7 +970,8 @@ $('#deploy').onclick=()=>{
 $('#cpy').onclick=()=>{ const v=$('#url').value; const ok=()=>toast('링크를 복사했어요'); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(ok,()=>{ $('#url').select(); document.execCommand('copy'); ok(); }); } else { $('#url').select(); document.execCommand('copy'); ok(); } };
 $('#opn').onclick=()=>{ window.open($('#url').value,'_blank'); };
 $('#qrdl').onclick=()=>{ if(!window.__svg) return; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([window.__svg],{type:'image/svg+xml'})); a.download=(window.__serial||'student')+'_QR_'+ST.g+'학년'+(ST.cls.trim()?'_'+ST.cls.trim():'')+'_'+ST.s+'학기.svg'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500); };
-$('#base').value=ST.base||defBase(); if(!ST.base) ST.base=$('#base').value;
+if(!ST.base||/github\.io|xn--vb0b6fb502i5lketai1xd2byz0e/.test(ST.base)) ST.base=defBase();
+$('#base').value=ST.base;
 $('#base').addEventListener('input',e=>{ ST.base=e.target.value; lset(); });
 $('#preview').onclick=()=>{
   const r=build(); if(!r) return;
